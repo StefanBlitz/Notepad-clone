@@ -23,7 +23,6 @@
 
     <DockPanel>
 
-        <!-- MENU -->
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
                 <MenuItem Header="New file"
@@ -62,14 +61,12 @@
             </MenuItem>
         </Menu>
 
-        <!-- TOOLBAR -->
         <ToolBar DockPanel.Dock="Top">
             <Button Content="New" Command="{Binding NewFileCommand}" />
             <Button Content="Open" Command="{Binding OpenCommand}" />
             <Button Content="Save" Command="{Binding SaveCommand}" />
         </ToolBar>
 
-        <!-- STATUS BAR -->
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem HorizontalAlignment="Right">
                 <TextBlock>
@@ -83,14 +80,12 @@
             </StatusBarItem>
         </StatusBar>
 
-        <!-- MAIN CONTENT -->
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="{Binding IsExplorerVisible, Converter={StaticResource BoolToWidthConverter}}"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition MinWidth="150"/>
             </Grid.ColumnDefinitions>
 
-            <!-- EXPLORER -->
             <TreeView x:Name="FolderTree"
                       Grid.Column="0"
                       Visibility="{Binding IsExplorerVisible, Converter={StaticResource BoolToVisibilityConverter}}"
@@ -114,10 +109,11 @@
 
             </TreeView>
 
-            <!-- EDITOR -->
+
             <TabControl Grid.Column="1"
                         ItemsSource="{Binding Documents}"
-                        SelectedItem="{Binding SelectedDocument}">
+                        SelectedItem="{Binding SelectedDocument}"
+                        SelectionChanged="TabControl_SelectionChanged">
 
                 <TabControl.ItemContainerStyle>
                     <Style TargetType="TabItem">
@@ -149,6 +145,9 @@
                                  AcceptsTab="True"
                                  VerticalScrollBarVisibility="Auto"
                                  HorizontalScrollBarVisibility="Auto"
+                                 FontFamily="Consolas"
+                                 FontSize="14"
+                                 Padding="10"
                                  TextChanged="Editor_TextChanged"
                                  SelectionChanged="Editor_SelectionChanged"/>
                     </DataTemplate>

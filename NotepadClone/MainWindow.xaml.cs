@@ -170,6 +170,15 @@ namespace NotepadClone
             base.OnClosing(e);
         }
 
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is TabControl tab &&
+                tab.SelectedContent is TextBox tb)
+            {
+                tb.Focus();
+            }
+        }
+
         private void Editor_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox tb &&
