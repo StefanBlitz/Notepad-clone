@@ -408,12 +408,18 @@ namespace NotepadClone.ViewModels
         {
             foreach (var item in items)
             {
-                if (item.Children.Contains(child))
+                if (item == null)
+                    continue;
+
+                if (item.Children != null && item.Children.Contains(child))
                     return item;
 
-                var result = FindParent(item.Children, child);
-                if (result != null)
-                    return result;
+                if (item.Children != null && item.Children.Count > 0)
+                {
+                    var result = FindParent(item.Children, child);
+                    if (result != null)
+                        return result;
+                }
             }
             return null;
         }
