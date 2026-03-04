@@ -24,6 +24,8 @@ namespace NotepadClone.ViewModels
         private int _fileCounter = 1;
         private string _copiedFolderPath;
 
+        private bool _isExplorerVisible = true;
+
         public ObservableCollection<DocumentViewModel> Documents { get; set; } = new ObservableCollection<DocumentViewModel>();
         public ObservableCollection<FileSystemItem> RootItems { get; } = new ObservableCollection<FileSystemItem>();
 
@@ -54,6 +56,8 @@ namespace NotepadClone.ViewModels
         public ICommand PasteFolderCommand { get; }
         public ICommand CreateFolderInFolderCommand { get; }
         public ICommand DeleteItemCommand { get; }
+        public ICommand ToggleExplorerCommand { get; }
+        public ICommand ShowAboutCommand { get; }
 
         #endregion
 
@@ -66,6 +70,7 @@ namespace NotepadClone.ViewModels
             SaveCommand = new RelayCommand(_ => SaveFile(), _ => SelectedDocument != null);
             SaveAsCommand = new RelayCommand(_ => SaveFileAs(), _ => SelectedDocument != null);
             OpenCommand = new RelayCommand(_ => OpenFile());
+
             CloseCommand = new RelayCommand(doc =>
             {
                 if (doc is DocumentViewModel document)
@@ -82,10 +87,39 @@ namespace NotepadClone.ViewModels
             CreateFolderInFolderCommand = new RelayCommand(item => CreateFolderInFolder(item as FileSystemItem));
             DeleteItemCommand = new RelayCommand(item => DeleteItem(item as FileSystemItem));
 
+            ToggleExplorerCommand = new RelayCommand(_ =>
+            {
+                IsExplorerVisible = !IsExplorerVisible;
+            });
+
+            ShowAboutCommand = new RelayCommand(_ => ShowAbout());
+
             CreateNewDocument();
             LoadDrives();
 
         }
+
+        #region View Operations
+        public bool IsExplorerVisible
+        {
+            get => _isExplorerVisible;
+            set
+            {
+                _isExplorerVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private void ShowAbout()
+        {
+            var about = new Views.AboutWindow
+            {
+                Owner = Application.Current.MainWindow
+            };
+
+            about.ShowDialog();
+        }
+        #endregion
 
         #region File Operations
 
