@@ -1,76 +1,96 @@
 ﻿<Window x:Class="NotepadClone.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:NotepadClone"
+        xmlns:helpers="clr-namespace:NotepadClone.Helpers"
         Title="Editor"
         Height="600"
         Width="1000">
 
+    <Window.Resources>
+        <helpers:BoolToWidthConverter x:Key="BoolToWidthConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </Window.Resources>
+
     <Window.InputBindings>
         <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewFileCommand}" />
-        <KeyBinding Key="N" Modifiers="Control+Shift" Command="{Binding CreateFileInFolderCommand}" CommandParameter="{Binding SelectedItem, ElementName=FolderTree}" />
-        <KeyBinding Key="N" Modifiers="Control+Alt" Command="{Binding CreateFolderInFolderCommand}" CommandParameter="{Binding SelectedItem, ElementName=FolderTree}" />
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}" />
         <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveAsCommand}" />
         <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenCommand}" />
         <KeyBinding Key="W" Modifiers="Control" Command="{Binding CloseCommand}" />
         <KeyBinding Key="W" Modifiers="Control+Shift" Command="{Binding CloseAllCommand}" />
-        <KeyBinding Key="C" Modifiers="Control+Shift" Command="{Binding CopyPathCommand}" CommandParameter="{Binding SelectedItem, ElementName=FolderTree}" />
-        <KeyBinding Key="F" Modifiers="Control+Shift" Command="{Binding CopyFolderCommand}" CommandParameter="{Binding SelectedItem, ElementName=FolderTree}" />
-        <KeyBinding Key="V" Modifiers="Control+Shift" Command="{Binding PasteFolderCommand}" CommandParameter="{Binding SelectedItem, ElementName=FolderTree}" />
-        <KeyBinding Key="Delete" Command="{Binding DeleteItemCommand}" CommandParameter="{Binding SelectedItem, ElementName=FolderTree}" />
         <KeyBinding Key="E" Modifiers="Control" Command="{Binding ToggleExplorerCommand}" />
     </Window.InputBindings>
 
-    <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-    </Window.Resources>
-
     <DockPanel>
 
-        
+        <!-- MENU -->
         <Menu DockPanel.Dock="Top">
-
             <MenuItem Header="File">
-                <MenuItem Header="New file" InputGestureText="Ctrl+N" Command="{Binding NewFileCommand}" />
-                <MenuItem Header="Open..." InputGestureText="Ctrl+O" Command="{Binding OpenCommand}" />
+                <MenuItem Header="New file"
+                          InputGestureText="Ctrl+N"
+                          Command="{Binding NewFileCommand}" />
+                <MenuItem Header="Open..."
+                          InputGestureText="Ctrl+O"
+                          Command="{Binding OpenCommand}" />
                 <Separator/>
-                <MenuItem Header="Save" InputGestureText="Ctrl+S" Command="{Binding SaveCommand}" />
-                <MenuItem Header="Save As" InputGestureText="Ctrl+Shift+S" Command="{Binding SaveAsCommand}" />
+                <MenuItem Header="Save"
+                          InputGestureText="Ctrl+S"
+                          Command="{Binding SaveCommand}" />
+                <MenuItem Header="Save As"
+                          InputGestureText="Ctrl+Shift+S"
+                          Command="{Binding SaveAsCommand}" />
                 <Separator/>
-                <MenuItem Header="Close" InputGestureText="Ctrl+W" Command="{Binding CloseCommand}" />
-                <MenuItem Header="Close All" InputGestureText="Ctrl+Shift+W" Command="{Binding CloseAllCommand}" />
+                <MenuItem Header="Close"
+                          InputGestureText="Ctrl+W"
+                          Command="{Binding CloseCommand}" />
+                <MenuItem Header="Close All"
+                          InputGestureText="Ctrl+Shift+W"
+                          Command="{Binding CloseAllCommand}" />
             </MenuItem>
 
             <MenuItem Header="View">
                 <MenuItem Header="Show Explorer"
                           IsCheckable="True"
-                          InputGestureText="Ctrl+E"
                           IsChecked="{Binding IsExplorerVisible, Mode=OneWay}"
-                          Command="{Binding ToggleExplorerCommand}" />
-                
+                          InputGestureText="Ctrl+E"
+                          Command="{Binding ToggleExplorerCommand}"/>
             </MenuItem>
+
             <MenuItem Header="Help">
                 <MenuItem Header="About"
                           Command="{Binding ShowAboutCommand}"/>
             </MenuItem>
-
         </Menu>
 
-       
+        <!-- TOOLBAR -->
         <ToolBar DockPanel.Dock="Top">
             <Button Content="New" Command="{Binding NewFileCommand}" />
             <Button Content="Open" Command="{Binding OpenCommand}" />
             <Button Content="Save" Command="{Binding SaveCommand}" />
         </ToolBar>
 
-        
+        <!-- STATUS BAR -->
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock>
+                    <Run Text="Ln "/>
+                    <Run Text="{Binding SelectedDocument.Line}"/>
+                    <Run Text=", Col "/>
+                    <Run Text="{Binding SelectedDocument.Column}"/>
+                    <Run Text=" | Chars "/>
+                    <Run Text="{Binding SelectedDocument.CharacterCount}"/>
+                </TextBlock>
+            </StatusBarItem>
+        </StatusBar>
+
+        <!-- MAIN CONTENT -->
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="{Binding IsExplorerVisible, Converter={StaticResource BoolToWidthConverter}}"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
+            <!-- EXPLORER -->
             <TreeView x:Name="FolderTree"
                       Grid.Column="0"
                       Visibility="{Binding IsExplorerVisible, Converter={StaticResource BoolToVisibilityConverter}}"
@@ -79,8 +99,10 @@
 
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="TreeViewItem">
-                        <EventSetter Event="Expanded" Handler="TreeViewItem_Expanded"/>
-                        <EventSetter Event="PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown"/>
+                        <EventSetter Event="Expanded"
+                                     Handler="TreeViewItem_Expanded"/>
+                        <EventSetter Event="PreviewMouseRightButtonDown"
+                                     Handler="TreeViewItem_PreviewMouseRightButtonDown"/>
                     </Style>
                 </TreeView.ItemContainerStyle>
 
@@ -92,7 +114,7 @@
 
             </TreeView>
 
-            
+            <!-- EDITOR -->
             <TabControl Grid.Column="1"
                         ItemsSource="{Binding Documents}"
                         SelectedItem="{Binding SelectedDocument}">
@@ -126,7 +148,9 @@
                                  AcceptsReturn="True"
                                  AcceptsTab="True"
                                  VerticalScrollBarVisibility="Auto"
-                                 HorizontalScrollBarVisibility="Auto"/>
+                                 HorizontalScrollBarVisibility="Auto"
+                                 TextChanged="Editor_TextChanged"
+                                 SelectionChanged="Editor_SelectionChanged"/>
                     </DataTemplate>
                 </TabControl.ContentTemplate>
 

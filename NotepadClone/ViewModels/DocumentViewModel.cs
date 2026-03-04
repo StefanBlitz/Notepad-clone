@@ -67,6 +67,39 @@ namespace NotepadClone.ViewModels
             }
         }
 
+        private int _line;
+        public int Line
+        {
+            get => _line;
+            set
+            {
+                _line = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _column;
+        public int Column
+        {
+            get => _column;
+            set
+            {
+                _column = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _characterCount;
+        public int CharacterCount
+        {
+            get => _characterCount;
+            set
+            {
+                _characterCount = value;
+                OnPropertyChanged();
+            }
+        }
+
         public string DisplayTitle => IsModified ? $"{Title}*" : Title;
     }
 }

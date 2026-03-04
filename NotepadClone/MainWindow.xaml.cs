@@ -155,5 +155,42 @@ namespace NotepadClone
 
             item.ContextMenu = menu;
         }
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                if (!vm.CanCloseApplication())
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
+
+            base.OnClosing(e);
+        }
+
+        private void Editor_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is TextBox tb &&
+                tb.DataContext is DocumentViewModel doc)
+            {
+                doc.CharacterCount = tb.Text.Length;
+            }
+        }
+
+        private void Editor_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox tb &&
+                tb.DataContext is DocumentViewModel doc)
+            {
+                int caret = tb.CaretIndex;
+                int line = tb.GetLineIndexFromCharacterIndex(caret);
+                int column = caret - tb.GetCharacterIndexFromLineIndex(line);
+
+                doc.Line = line + 1;
+                doc.Column = column + 1;
+            }
+        }
     }
 }

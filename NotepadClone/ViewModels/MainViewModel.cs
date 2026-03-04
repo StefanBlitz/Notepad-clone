@@ -121,6 +121,32 @@ namespace NotepadClone.ViewModels
         }
         #endregion
 
+        public bool CanCloseApplication()
+        {
+            var modifiedDocs = Documents.Where(d => d.IsModified).ToList();
+
+            if (!modifiedDocs.Any())
+                return true;
+
+            var result = _dialogService.Show(
+                "There are unsaved documents. Do you want to save all changes?",
+                "Unsaved changes");
+
+            if (result == MessageBoxResult.Cancel)
+                return false;
+
+            if (result == MessageBoxResult.Yes)
+            {
+                foreach (var doc in modifiedDocs)
+                {
+                    SelectedDocument = doc;
+                    SaveFile();
+                }
+            }
+
+            return true;
+        }
+
         #region File Operations
 
         private void CreateNewDocument()
