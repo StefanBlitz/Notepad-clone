@@ -4,6 +4,7 @@ using System.Windows.Input;
 using NotepadClone.ViewModels;
 using NotepadClone.Models;
 using System.Windows.Media;
+using NotepadClone.Views;
 
 namespace NotepadClone
 {
@@ -200,6 +201,15 @@ namespace NotepadClone
                 doc.Line = line + 1;
                 doc.Column = column + 1;
             }
+        }
+
+        private void OpenSearchWindow(object sender, RoutedEventArgs e)
+        {
+            var vm = DataContext;
+
+            var window = new SearchWindow(vm);
+            window.Owner = this;
+            window.Show();
         }
     }
 }

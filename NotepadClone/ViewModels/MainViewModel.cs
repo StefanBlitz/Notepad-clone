@@ -26,8 +26,12 @@ namespace NotepadClone.ViewModels
 
         private bool _isExplorerVisible = true;
 
+        private int currentDocumentIndex = 0;
+        private int lastIndex = 0;
+
         public ObservableCollection<DocumentViewModel> Documents { get; set; } = new ObservableCollection<DocumentViewModel>();
         public ObservableCollection<FileSystemItem> RootItems { get; } = new ObservableCollection<FileSystemItem>();
+
 
         public DocumentViewModel SelectedDocument
         {
@@ -58,6 +62,15 @@ namespace NotepadClone.ViewModels
         public ICommand DeleteItemCommand { get; }
         public ICommand ToggleExplorerCommand { get; }
         public ICommand ShowAboutCommand { get; }
+
+        public string SearchText { get; set; }
+        public string ReplaceText { get; set; }
+
+        public bool SearchInAllTabs { get; set; }
+
+        public ICommand FindCommand { get; }
+        public ICommand ReplaceCommand { get; }
+        public ICommand ReplaceAllCommand { get; }
 
         #endregion
 
@@ -93,6 +106,10 @@ namespace NotepadClone.ViewModels
             });
 
             ShowAboutCommand = new RelayCommand(_ => ShowAbout());
+
+            FindCommand = new RelayCommand(_ => Find());
+            ReplaceCommand = new RelayCommand(_ => Replace());
+            ReplaceAllCommand = new RelayCommand(_ => ReplaceAll());
 
             CreateNewDocument();
             LoadDrives();
@@ -482,6 +499,91 @@ namespace NotepadClone.ViewModels
                 }
             }
             return null;
+        }
+
+        private void Find()
+        {
+            if (string.IsNullOrEmpty(SearchText) || Documents.Count == 0)
+                return;
+
+            if (!SearchInAllTabs)
+            {
+                var doc = SelectedDocument;
+                if (doc == null)
+                    return;
+
+                string text = doc.Content ?? string.Empty;
+
+                int index = text.IndexOf(SearchText, lastIndex, StringComparison.OrdinalIgnoreCase);
+
+                if (index >= 0)
+                {
+                    lastIndex = index + SearchText.Length;
+                }
+                else
+                {
+                    lastIndex = 0;
+
+                    MessageBox.Show(Application.Current.MainWindow, "Text not found in the current document.", "Find", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+
+                return;
+            }
+
+            int startDoc = currentDocumentIndex;
+
+            do
+            {
+                var doc = Documents[currentDocumentIndex];
+                string text = doc.Content ?? string.Empty;
+
+                int index = text.IndexOf(SearchText, lastIndex, StringComparison.OrdinalIgnoreCase);
+
+                if (index >= 0)
+                {
+                    SelectedDocument = doc;
+                    lastIndex = index + SearchText.Length;
+                    return;
+                }
+
+                lastIndex = 0;
+                currentDocumentIndex = (currentDocumentIndex + 1) % Documents.Count;
+
+            } while (currentDocumentIndex != startDoc);
+
+            MessageBox.Show(Application.Current.MainWindow, "Text not found in any open document.", "Find", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void Replace()
+        {
+            if (SelectedDocument == null) return;
+            if (string.IsNullOrEmpty(SearchText)) return;
+
+            if (SelectedDocument.Content.Contains(SearchText))
+            {
+                SelectedDocument.Content =
+                    SelectedDocument.Content.Replace(SearchText, ReplaceText);
+            }
+        }
+
+        private void ReplaceAll()
+        {
+            if (string.IsNullOrEmpty(SearchText)) return;
+
+            if (SearchInAllTabs)
+            {
+                foreach (var doc in Documents)
+                {
+                    doc.Content = doc.Content.Replace(SearchText, ReplaceText);
+                }
+            }
+            else
+            {
+                if (SelectedDocument == null) return;
+
+                SelectedDocument.Content =
+                    SelectedDocument.Content.Replace(SearchText, ReplaceText);
+            }
         }
 
         #endregion

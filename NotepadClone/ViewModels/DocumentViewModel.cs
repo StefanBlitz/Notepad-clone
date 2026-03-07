@@ -100,6 +100,8 @@ namespace NotepadClone.ViewModels
             }
         }
 
+
+
         public string DisplayTitle => IsModified ? $"{Title}*" : Title;
     }
 }

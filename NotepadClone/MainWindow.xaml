@@ -55,6 +55,11 @@
                           Command="{Binding ToggleExplorerCommand}"/>
             </MenuItem>
 
+            <MenuItem Header="Search">
+                <MenuItem Header="Find / Replace..."
+              Click="OpenSearchWindow"/>
+            </MenuItem>
+
             <MenuItem Header="Help">
                 <MenuItem Header="About"
                           Command="{Binding ShowAboutCommand}"/>
