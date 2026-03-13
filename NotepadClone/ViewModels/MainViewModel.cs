@@ -19,6 +19,7 @@ namespace NotepadClone.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
+        #region Variables
         private readonly IDialogService _dialogService;
         private DocumentViewModel _selectedDocument;
         private int _fileCounter = 1;
@@ -28,9 +29,12 @@ namespace NotepadClone.ViewModels
 
         private int currentDocumentIndex = 0;
         private int lastIndex = 0;
+        #endregion
 
+        #region Collections
         public ObservableCollection<DocumentViewModel> Documents { get; set; } = new ObservableCollection<DocumentViewModel>();
         public ObservableCollection<FileSystemItem> RootItems { get; } = new ObservableCollection<FileSystemItem>();
+        #endregion
 
 
         public DocumentViewModel SelectedDocument
@@ -76,6 +80,7 @@ namespace NotepadClone.ViewModels
 
         public MainViewModel()
         {
+            _isExplorerVisible = AppConfig.LoadExplorerState();
 
             _dialogService = new DialogService();
 
@@ -122,8 +127,12 @@ namespace NotepadClone.ViewModels
             get => _isExplorerVisible;
             set
             {
-                _isExplorerVisible = value;
-                OnPropertyChanged();
+                if (_isExplorerVisible != value)
+                {
+                    _isExplorerVisible = value;
+                    OnPropertyChanged();
+                    AppConfig.SaveExplorerState(value);
+                }
             }
         }
 
@@ -140,21 +149,24 @@ namespace NotepadClone.ViewModels
 
         public bool CanCloseApplication()
         {
+            
             var modifiedDocs = Documents.Where(d => d.IsModified).ToList();
 
+            
             if (!modifiedDocs.Any())
                 return true;
 
-            var result = _dialogService.Show(
-                "There are unsaved documents. Do you want to save all changes?",
-                "Unsaved changes");
-
-            if (result == MessageBoxResult.Cancel)
-                return false;
-
-            if (result == MessageBoxResult.Yes)
+            
+            foreach (var doc in modifiedDocs)
             {
-                foreach (var doc in modifiedDocs)
+                
+                var result = _dialogService.Show($"Do you want to save changes to {doc.Title}?", "Unsaved changes");
+
+                
+                if (result == MessageBoxResult.Cancel)
+                    return false;
+
+                if (result == MessageBoxResult.Yes)
                 {
                     SelectedDocument = doc;
                     SaveFile();
@@ -518,12 +530,17 @@ namespace NotepadClone.ViewModels
 
                 if (index >= 0)
                 {
+                    
+                    doc.SelectionStart = index;
+                    doc.SelectionLength = SearchText.Length;
+
                     lastIndex = index + SearchText.Length;
                 }
                 else
                 {
                     lastIndex = 0;
-
+                    
+                    doc.SelectionLength = 0;
                     MessageBox.Show(Application.Current.MainWindow, "Text not found in the current document.", "Find", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
@@ -542,11 +559,18 @@ namespace NotepadClone.ViewModels
                 if (index >= 0)
                 {
                     SelectedDocument = doc;
+
+                    
+                    doc.SelectionStart = index;
+                    doc.SelectionLength = SearchText.Length;
+
                     lastIndex = index + SearchText.Length;
                     return;
                 }
 
                 lastIndex = 0;
+                
+                doc.SelectionLength = 0;
                 currentDocumentIndex = (currentDocumentIndex + 1) % Documents.Count;
 
             } while (currentDocumentIndex != startDoc);

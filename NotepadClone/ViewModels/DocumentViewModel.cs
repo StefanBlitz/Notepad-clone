@@ -11,13 +11,15 @@ namespace NotepadClone.ViewModels
 {
     public class DocumentViewModel : BaseViewModel
     {
+        #region Variables
         private string _title;
         private string _content = string.Empty;
         private bool _isModified;
         private string _filePath;
+        #endregion
 
 
-
+        #region Title
         public string Title
         {
             get => _title;
@@ -28,7 +30,9 @@ namespace NotepadClone.ViewModels
                 OnPropertyChanged(nameof(DisplayTitle));
             }
         }
+        #endregion
 
+        #region Content
         public string Content
         {
             get => _content;
@@ -42,7 +46,9 @@ namespace NotepadClone.ViewModels
                 }
             }
         }
+        #endregion
 
+        #region IsModified
         public bool IsModified
         {
             get => _isModified;
@@ -56,7 +62,9 @@ namespace NotepadClone.ViewModels
                 }
             }
         }
+        #endregion
 
+        #region FilePath
         public string FilePath
         {
             get => _filePath;
@@ -66,7 +74,9 @@ namespace NotepadClone.ViewModels
                 OnPropertyChanged();
             }
         }
+        #endregion
 
+        #region Line
         private int _line;
         public int Line
         {
@@ -77,7 +87,9 @@ namespace NotepadClone.ViewModels
                 OnPropertyChanged();
             }
         }
+        #endregion
 
+        #region Column
         private int _column;
         public int Column
         {
@@ -88,7 +100,9 @@ namespace NotepadClone.ViewModels
                 OnPropertyChanged();
             }
         }
+        #endregion
 
+        #region CharacterCount
         private int _characterCount;
         public int CharacterCount
         {
@@ -99,6 +113,37 @@ namespace NotepadClone.ViewModels
                 OnPropertyChanged();
             }
         }
+        #endregion
+
+        #region Selection
+        private int _selectionStart;
+        public int SelectionStart
+        {
+            get => _selectionStart;
+            set
+            {
+                if (_selectionStart != value)
+                {
+                    _selectionStart = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private int _selectionLength;
+        public int SelectionLength
+        {
+            get => _selectionLength;
+            set
+            {
+                if (_selectionLength != value)
+                {
+                    _selectionLength = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+#endregion
 
 
 

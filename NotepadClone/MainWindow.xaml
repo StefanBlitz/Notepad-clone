@@ -146,6 +146,8 @@
                 <TabControl.ContentTemplate>
                     <DataTemplate>
                         <TextBox Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}"
+                                 helpers:TextBoxBehavior.BoundSelectionStart="{Binding SelectionStart}"
+                                 helpers:TextBoxBehavior.BoundSelectionLength="{Binding SelectionLength}"
                                  AcceptsReturn="True"
                                  AcceptsTab="True"
                                  VerticalScrollBarVisibility="Auto"
